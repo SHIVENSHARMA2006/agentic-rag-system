@@ -1,13 +1,11 @@
 from app.agents.graph import graph
-from app.agents.state_factory import (
-    create_initial_state,
-)
+from app.agents.state_factory import create_initial_state
 from app.core.logging import logger
 
 
 class RAGService:
     """
-    Entry point for the complete Agentic RAG workflow.
+    Executes the complete Agentic RAG pipeline.
     """
 
     def ask(
@@ -19,25 +17,39 @@ class RAGService:
             "Starting Agentic RAG workflow..."
         )
 
-        state = create_initial_state(
-            question=question,
-        )
+        try:
 
-        final_state = graph.invoke(
-            state,
-        )
+            state = create_initial_state(
+                question=question,
+            )
 
-        logger.info(
-            "Workflow completed successfully."
-        )
+            final_state = graph.invoke(
+                state,
+            )
 
-        return {
-            "answer": final_state.get(
-                "answer",
-                "",
-            ),
-            "sources": final_state.get(
-                "sources",
-                [],
-            ),
-        }
+            logger.info(
+                "Workflow completed successfully."
+            )
+
+            return {
+                "answer": final_state.get(
+                    "answer",
+                    "",
+                ),
+                "sources": final_state.get(
+                    "sources",
+                    [],
+                ),
+            }
+
+        except Exception as e:
+
+            logger.exception(e)
+
+            return {
+                "answer": (
+                    "Sorry, an unexpected error occurred "
+                    "while processing your request."
+                ),
+                "sources": [],
+            }
