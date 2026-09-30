@@ -6,6 +6,9 @@ from app.core.exceptions import LLMProviderError
 from app.providers.llm.base import BaseLLMProvider
 
 
+import time
+
+
 class GoogleLLMProvider(BaseLLMProvider):
     """
     Google Gemini implementation of our LLM Provider.
@@ -16,22 +19,34 @@ class GoogleLLMProvider(BaseLLMProvider):
 
     def generate(self, prompt: str) -> str:
         """
-        Generate a response using Gemini.
+        Generate a response using Gemini with retry logic for transient errors.
         """
+        max_retries = 3
+        backoff = 2
 
-        try:
-            response = self.client.models.generate_content(
-                model=settings.LLM_MODEL,
-                contents=prompt,
-                config=types.GenerateContentConfig(
-                    temperature=0.2
-                ),
-            )
+        for attempt in range(max_retries):
+            try:
+                response = self.client.models.generate_content(
+                    model=settings.LLM_MODEL,
+                    contents=prompt,
+                    config=types.GenerateContentConfig(
+                        temperature=0.2
+                    ),
+                )
 
-            return response.text
+                return response.text
 
-        except Exception as e:
-            raise LLMProviderError(str(e))
+            except Exception as e:
+                err_str = str(e)
+                if (
+                    "503" in err_str
+                    or "429" in err_str
+                    or "UNAVAILABLE" in err_str
+                ) and attempt < max_retries - 1:
+                    time.sleep(backoff)
+                    backoff *= 2
+                    continue
+                raise LLMProviderError(err_str)
 
     def health_check(self) -> bool:
         """
