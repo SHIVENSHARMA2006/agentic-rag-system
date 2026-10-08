@@ -35,7 +35,7 @@ class RetrievalAgent(BaseAgent):
             return state
 
         chunks = self.retrieval_service.retrieve(
-            state["question"]
+            state.get("standalone_question", state["question"])
         )
 
         metadata["services"][

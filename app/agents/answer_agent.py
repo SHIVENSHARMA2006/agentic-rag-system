@@ -1,7 +1,5 @@
 from app.agents.state import GraphState
-from app.providers.llm.google_llm_provider import (
-    GoogleLLMProvider,
-)
+from app.providers.llm.groq_llm_provider import GroqLLMProvider
 
 
 class AnswerAgent:
@@ -11,7 +9,7 @@ class AnswerAgent:
     """
 
     def __init__(self):
-        self.llm = GoogleLLMProvider()
+        self.llm = GroqLLMProvider()
 
     def run(
         self,

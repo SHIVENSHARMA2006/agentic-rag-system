@@ -1,6 +1,6 @@
 from app.agents.base import BaseAgent
 from app.agents.state import GraphState
-from app.providers.llm.google_llm_provider import GoogleLLMProvider
+from app.providers.llm.groq_llm_provider import GroqLLMProvider
 from app.utils.json_parser import extract_json
 
 
@@ -90,13 +90,16 @@ Question:
 
 Detected Intent:
 {intent}
+
+Recent conversation (use it only to resolve what the latest question refers to):
+{history}
 """
 
 
 class RouterAgent(BaseAgent):
 
     def __init__(self):
-        self.llm = GoogleLLMProvider()
+        self.llm = GroqLLMProvider()
 
     def execute(
         self,
@@ -104,8 +107,12 @@ class RouterAgent(BaseAgent):
     ) -> GraphState:
 
         prompt = PLANNING_PROMPT.format(
-            question=state["question"],
+            question=state.get("standalone_question", state["question"]),
             intent=state["intent"],
+            history="\n".join(
+                f'{message["role"].title()}: {message["content"]}'
+                for message in state.get("conversation_history", [])
+            ) or "No earlier turns.",
         )
 
         response = self.llm.generate(prompt)

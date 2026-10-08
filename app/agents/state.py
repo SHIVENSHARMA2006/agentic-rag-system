@@ -8,6 +8,9 @@ class GraphState(TypedDict):
 
     # User Input
     question: str
+    standalone_question: str
+    conversation_title: str
+    conversation_history: list[dict[str, str]]
 
     # Query Understanding
     intent: str

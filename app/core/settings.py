@@ -10,6 +10,7 @@ class Settings(BaseSettings):
     DEBUG: bool = True
 
     GOOGLE_API_KEY: str = ""
+    GROQ_API_KEY: str = ""
 
     TAVILY_API_KEY: str = ""
 
@@ -39,7 +40,7 @@ class Settings(BaseSettings):
     
 
 
-    LLM_MODEL: str = "gemini-2.5-pro"
+    LLM_MODEL: str = "openai/gpt-oss-120b"
     EMBEDDING_MODEL: str = "text-embedding-004"
 
     LOG_LEVEL: str = "INFO"

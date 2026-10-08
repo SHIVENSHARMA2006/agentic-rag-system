@@ -35,7 +35,7 @@ class WebAgent(BaseAgent):
             return state
 
         results = self.tavily.search(
-            state["question"]
+            state.get("standalone_question", state["question"])
         )
 
         metadata["services"][

@@ -12,7 +12,9 @@ class QdrantService:
     with Qdrant.
     """
 
-    VECTOR_SIZE = 768
+    # gemini-embedding-001 currently returns 3072-dimensional vectors.
+    # Keep newly created collections compatible with the active embedding model.
+    VECTOR_SIZE = 3072
 
     def __init__(self):
         self.client = QdrantClient(
